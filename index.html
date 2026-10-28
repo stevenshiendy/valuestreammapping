@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow Lab: Value Stream Mapping in Construction</title>
+<meta name="description" content="A scroll story and interactive lab on Value Stream Mapping for material flow in construction, by Steven Glenn Shiendy, BINUS University Bandung.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0d0d0d; --ink:#1a1a1a; --white:#fff; --paper:#f5f5f1;
+  --green:#1e8e4e; --lime:#46d17f; --mint:#dff3e7; --grey:#8a8a8a; --line:#e2e2dc;
+  --amber:#f2c94c; --r-xl:40px; --r-lg:28px; --r-md:18px; --pill:999px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,.disp{font-family:"Space Grotesk",sans-serif;letter-spacing:-.02em;line-height:1.1}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+
+/* nav + progress */
+nav{position:sticky;top:12px;z-index:40;max-width:1160px;margin:12px auto 0;padding:0 20px}
+.navbar{display:flex;align-items:center;justify-content:space-between;background:var(--black);color:#fff;border-radius:var(--pill);padding:8px 8px 8px 20px;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Space Grotesk";font-weight:700;white-space:nowrap}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(70,209,127,.25)}
+.chapters{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.chapters::-webkit-scrollbar{display:none}
+.chapters a{text-decoration:none;color:#aaa;font-size:13px;padding:7px 12px;border-radius:var(--pill);white-space:nowrap;transition:.25s}
+.chapters a b{font-family:"Space Grotesk";margin-right:6px;color:#666}
+.chapters a.on{background:var(--lime);color:var(--black)}
+.chapters a.on b{color:var(--black)}
+.progress{height:4px;background:#222;border-radius:4px;margin:6px 26px 0;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--lime);transition:width .1s}
+@media(max-width:820px){.chapters a span{display:none}}
+
+/* chapter scaffolding */
+.chapter{padding:80px 0 40px;scroll-margin-top:80px}
+.ch-head{display:flex;gap:22px;align-items:flex-start;margin-bottom:26px}
+.ch-num{flex:0 0 auto;width:68px;height:68px;border-radius:50%;background:var(--black);color:var(--lime);display:grid;place-items:center;font-family:"Space Grotesk";font-weight:700;font-size:26px}
+.kicker{font-size:12px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.12em}
+.ch-title{font-size:clamp(30px,4.2vw,50px);margin:6px 0 10px}
+.lead{color:#555;max-width:720px;font-size:17px}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-xl);padding:32px}
+.dark{background:var(--black);color:#fff;border-color:var(--black)}
+.btn{border:0;border-radius:var(--pill);padding:12px 22px;font-weight:600;font-size:14px;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-lime{background:var(--lime);color:var(--black)}
+.btn-lime:hover{filter:brightness(1.07)}
+.btn-ghost{background:transparent;color:inherit;border:1.5px solid currentColor}
+.btn-black{background:var(--black);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* hero */
+.hero{padding:64px 0 20px}
+.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:24px}
+.hero h1{font-size:clamp(40px,6.5vw,78px);margin:18px 0}
+.hero h1 em{font-style:normal;color:var(--green)}
+.tag{display:inline-flex;gap:8px;align-items:center;background:var(--mint);color:var(--green);font-weight:600;font-size:13px;padding:6px 14px;border-radius:var(--pill)}
+.hero-side{display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.big-num{font-family:"Space Grotesk";font-size:88px;font-weight:700;color:var(--lime);line-height:1}
+.scroll-cue{display:inline-flex;align-items:center;gap:10px;font-size:14px;color:#bbb}
+.scroll-cue i{width:26px;height:40px;border:2px solid #555;border-radius:20px;position:relative}
+.scroll-cue i::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:var(--lime);animation:cue 1.6s infinite}
+@keyframes cue{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(14px)}}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr}.card{padding:24px}}
+
+/* journey track */
+.track-wrap{margin-top:8px}
+.track-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:#aaa}
+.track-label b{color:#fff;font-family:"Space Grotesk";font-size:15px}
+.track{position:relative;height:46px;background:#1b1b1b;border-radius:var(--pill);overflow:hidden;display:flex}
+.seg{height:100%;position:relative;transition:width .6s ease}
+.seg.p{background:#555}
+.seg.va{background:var(--green)}
+.seg.w{background:#262626;background-image:repeating-linear-gradient(135deg,#2c2c2c 0 6px,#232323 6px 12px)}
+.seg.tw{box-shadow:inset 0 0 0 2px var(--lime)}
+.marker{position:absolute;top:50%;left:0;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 6px rgba(70,209,127,.25);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--black);z-index:2}
+.track.light{background:#ececea}
+.track.light .seg.w{background:#d9d9d4;background-image:repeating-linear-gradient(135deg,#dcdcd7 0 6px,#d2d2cc 6px 12px)}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:6px}
+.caption{margin-top:14px;min-height:52px;font-size:16px}
+.caption b{color:var(--lime)}
+.day{font-family:"Space Grotesk";font-size:46px;font-weight:700;line-height:1}
+.legend{display:flex;gap:16px;font-size:12px;color:#999;flex-wrap:wrap;margin-top:10px}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-2px;background:var(--c)}
+
+/* map */
+.map{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:10px 4px 16px;scroll-behavior:smooth}
+.node{flex:0 0 auto;width:124px;border-radius:var(--r-md);padding:14px;background:var(--white);border:1.5px solid var(--line);position:relative;transition:all .45s ease}
+.dark .node{background:#1b1b1b;border-color:#333;color:#fff}
+.node.va{background:var(--green);border-color:var(--green);color:#fff}
+.node h4{font-size:14.5px;margin-bottom:8px;line-height:1.2;min-height:34px}
+.node .ct{font-size:12px;opacity:.85}
+.node .loc{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:4px}
+.node s,.wait s{opacity:.55;margin-left:4px}
+.node.tw{border-color:var(--lime);box-shadow:0 0 0 4px rgba(70,209,127,.25)}
+.node.ghost{background:transparent!important;border:1.5px dashed #555;color:#777;width:92px;opacity:.75}
+.light-map .node.ghost{border-color:#bbb;color:#999}
+.node.ghost h4{text-decoration:line-through}
+.badges{position:absolute;top:-11px;right:10px;display:flex;gap:4px}
+.badge{width:24px;height:24px;border-radius:50%;background:var(--black);color:var(--lime);font:700 12px "Space Grotesk";display:grid;place-items:center;border:2px solid var(--lime)}
+.node.hidden,.wait.hidden{opacity:0;transform:translateY(16px);pointer-events:none}
+.node.hl,.wait.hl{outline:3px solid var(--amber);outline-offset:3px;background-color:#fff7dc}
+.node.va.hl{background-color:var(--green)}
+.node.dim,.wait.dim{opacity:.28}
+.wait{flex:0 0 auto;width:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:all .45s ease;border-radius:var(--r-md)}
+.tri{width:0;height:0;border-left:var(--s) solid transparent;border-right:var(--s) solid transparent;border-bottom:calc(var(--s)*1.6) solid var(--amber);transition:all .45s ease}
+.wait.small .tri{border-bottom-color:#9a9a9a}
+.wait span{font-size:12px;font-weight:600;text-align:center;white-space:nowrap}
+.wait.tw span{color:var(--green)}
+.dark .wait.tw span{color:var(--lime)}
+.arrow{flex:0 0 auto;width:18px;align-self:center;height:2px;background:#999;position:relative}
+.arrow::after{content:"";position:absolute;right:-1px;top:-4px;border-left:7px solid #999;border-top:5px solid transparent;border-bottom:5px solid transparent}
+
+/* walk narration */
+.walk{display:grid;grid-template-columns:260px 1fr;gap:20px;margin-top:20px}
+.walk-text{background:var(--mint);border-radius:var(--r-lg);padding:22px}
+.walk-text .disp{font-size:22px;margin-bottom:6px}
+.walk-step{font-size:12px;color:var(--green);font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+@media(max-width:860px){.walk{grid-template-columns:1fr}}
+
+/* wastes */
+.pills{display:flex;flex-wrap:wrap;gap:10px}
+.pill{border-radius:var(--pill);padding:10px 18px;background:var(--white);border:1px solid var(--line);font-weight:500;font-size:14px;transition:.2s}
+.pill:hover{border-color:var(--black)}
+.pill.on{background:var(--black);color:#fff;border-color:var(--black)}
+.waste-info{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.hbar{display:flex;align-items:center;gap:10px;font-size:13px;margin:7px 0}
+.hbar .lab{width:120px;flex:0 0 auto}
+.hbar .b{height:14px;border-radius:var(--pill);background:#ddd;transition:all .4s}
+.hbar.on .b{background:var(--black)}
+.hbar.on .lab{font-weight:700}
+@media(max-width:760px){.waste-info{grid-template-columns:1fr}}
+
+/* lab */
+.levers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.lever{border-radius:var(--r-lg);padding:20px;background:var(--white);border:1.5px solid var(--line);text-align:left;transition:all .3s;color:var(--ink);position:relative}
+.lever:hover{border-color:var(--black)}
+.lever.on{background:var(--black);color:#fff;border-color:var(--lime);box-shadow:0 0 0 4px rgba(70,209,127,.2)}
+.lever .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.lever .n{width:34px;height:34px;border-radius:50%;background:var(--black);color:var(--lime);display:grid;place-items:center;font:700 15px "Space Grotesk"}
+.lever.on .n{background:var(--lime);color:var(--black)}
+.switch{width:46px;height:26px;border-radius:var(--pill);background:#ddd;position:relative;transition:.3s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.lever.on .switch{background:var(--lime)}
+.lever.on .switch::after{left:23px}
+.lever h3{font-size:18px;margin-bottom:6px}
+.lever p{font-size:13px;opacity:.8}
+.lever .tps{display:inline-block;margin-top:10px;font-size:11px;padding:3px 10px;border-radius:var(--pill);background:var(--mint);color:var(--green);font-weight:600}
+.lever.on .tps{background:#1f3a2a;color:var(--lime)}
+@media(max-width:900px){.levers{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.levers{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:22px}
+.kpi{background:#1a1a1a;border-radius:var(--r-md);padding:14px;transition:background .3s}
+.kpi.flash{animation:flash 1s ease}
+@keyframes flash{0%{background:#2b5a3d}100%{background:#1a1a1a}}
+.kpi b{font-family:"Space Grotesk";font-size:24px;display:block;color:#fff}
+.kpi .k{font-size:11.5px;color:#999}
+.kpi .d{font-size:12px;font-weight:600;color:#777}
+.kpi .d.good{color:var(--lime)}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.kpis{grid-template-columns:1fr 1fr}}
+.lab-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:900px){.lab-grid{grid-template-columns:1fr}}
+.log{list-style:none;display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto}
+.log li{background:var(--paper);border-radius:var(--r-md);padding:12px 14px;font-size:13.5px;display:flex;gap:10px;align-items:flex-start;animation:pop .4s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.log .badge{flex:0 0 auto}
+.log .empty{background:transparent;color:#888;padding:0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);background:var(--black);color:#fff;border-radius:var(--pill);padding:12px 22px;font-size:14px;z-index:60;transition:transform .4s ease;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:92vw;text-align:center}
+.toast.show{transform:translate(-50%,0)}
+.toast b{color:var(--lime)}
+.narr{margin-top:16px;background:var(--mint);border-radius:var(--r-lg);padding:16px 20px;font-size:15px;display:none}
+.narr.show{display:block;animation:pop .4s ease}
+
+/* race + rings */
+.race{display:flex;flex-direction:column;gap:22px}
+.rings{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+.ringcard{display:flex;align-items:center;gap:22px}
+.ring{flex:0 0 auto;width:150px;height:150px;border-radius:50%;display:grid;place-items:center;transition:background .8s}
+.ring>div{width:112px;height:112px;border-radius:50%;background:var(--white);display:grid;place-items:center;text-align:center}
+.ring b{font-family:"Space Grotesk";font-size:30px}
+.ring span{font-size:11px;color:#777;display:block}
+@media(max-width:700px){.rings{grid-template-columns:1fr}}
+
+/* calc */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.field{margin-bottom:18px}
+.field label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin-bottom:8px}
+.field output{background:var(--mint);color:var(--green);padding:2px 10px;border-radius:var(--pill)}
+input[type=range]{width:100%;accent-color:var(--green)}
+.res{background:var(--black);color:#fff;border-radius:var(--r-lg);padding:22px;display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:14px}
+.res b{font-family:"Space Grotesk";font-size:38px;color:var(--lime)}
+.formula{font-size:13px;color:#555;background:var(--paper);border-radius:var(--r-md);padding:14px 16px;font-family:ui-monospace,monospace}
+.bar3{height:16px;border-radius:var(--pill);background:#eee;overflow:hidden;display:flex}
+.bar3 i{display:block;height:100%;transition:width .3s}
+@media(max-width:860px){.calc{grid-template-columns:1fr}}
+
+.refs{columns:2;column-gap:28px;font-size:13.5px;padding-left:18px}
+.refs li{break-inside:avoid;margin:0 0 12px;color:#444}
+.refs a{color:var(--green);word-break:break-all}
+@media(max-width:760px){.refs{columns:1}}
+footer{max-width:1160px;margin:40px auto 24px;padding:0 20px}
+.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.foot .name{font-family:"Space Grotesk";font-size:20px;color:#fff}
+.chip{display:inline-block;border:1px solid #444;border-radius:var(--pill);padding:6px 14px;font-size:13px;margin:6px 6px 0 0;color:#ddd}
+.note{font-size:12px;color:var(--grey)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="navbar">
+    <div class="brand"><span class="dot"></span>Flow Lab</div>
+    <div class="chapters" id="chapNav">
+      <a href="#c1"><b>01</b><span>The journey</span></a>
+      <a href="#c2"><b>02</b><span>Walk the stream</span></a>
+      <a href="#c3"><b>03</b><span>Spot the waste</span></a>
+      <a href="#c4"><b>04</b><span>Pull the levers</span></a>
+      <a href="#c5"><b>05</b><span>The race</span></a>
+      <a href="#c6"><b>06</b><span>Your numbers</span></a>
+    </div>
+  </div>
+  <div class="progress"><i id="prog"></i></div>
+</nav>
+
+<!-- HERO -->
+<header class="hero"><div class="wrap hero-grid">
+  <div class="card reveal">
+    <span class="tag">● Lean / Toyota Production System</span>
+    <h1>One tonne of steel.<br><em>26 days</em> to travel 420 metres.</h1>
+    <p class="lead">This is the story of a single floor's worth of rebar on a 12-storey building in Bandung. You will follow it, map it, find where its time goes, then fix the flow yourself, one lean lever at a time.</p>
+    <p class="note" style="margin-top:16px">Companion to the article "Value Stream Mapping for Material Flow Optimization in Construction Projects" by Steven Glenn Shiendy, Global Supply Chain Management (LA76), BINUS University Bandung. Case figures are simulated for teaching and calibrated from published open-access studies.</p>
+  </div>
+  <div class="card dark hero-side reveal">
+    <div>
+      <div class="kicker" style="color:var(--lime)">Share of time that adds value</div>
+      <div class="big-num" id="heroNum">0%</div>
+      <p style="color:#bbb;margin-top:10px">Of the 26.3 working days the steel spends in the system, only 56 hours turn it into part of the building.</p>
+    </div>
+    <a href="#c1" class="scroll-cue" style="text-decoration:none"><i></i>Scroll to start the story</a>
+  </div>
+</div></header>
+
+<!-- CHAPTER 1 -->
+<section class="chapter" id="c1"><div class="wrap">
+  <div class="ch-head reveal">
+    <div class="ch-num">01</div>
+    <div><span class="kicker">The journey</span><h2 class="ch-title">Follow the steel</h2>
+    <p class="lead">Press play. The green dot is our tonne of rebar. Green stretches are real work, grey stretches are handling, and striped stretches are time spent sitting still.</p></div>
+  </div>
+  <div class="card dark reveal">
+    <div class="row" style="justify-content:space-between;margin-bottom:18px">
+      <div><div class="kicker" style="color:#888">Working day</div><div class="day" id="j1Day">0.0</div></div>
+      <div class="row"><button class="btn btn-lime" id="j1Play">▶ Play the journey</button><button class="btn btn-ghost" id="j1Reset" style="color:#bbb">Reset</button></div>
+    </div>
+    <div class="track-wrap"><div class="track" id="j1Track"></div><div class="axis"><span>Day 0</span><span>Day 10</span><span>Day 20</span><span>Day 27</span></div></div>
+    <div class="caption" id="j1Cap">The steel has not been ordered yet.</div>
+    <div class="legend"><span style="--c:var(--green)">Value-adding work</span><span style="--c:#555">Handling and paperwork</span><span style="--c:#333">Waiting and inventory</span></div>
+  </div>
+</div></section>
+
+<!-- CHAPTER 2 -->
+<section class="chapter" id="c2"><div class="wrap">
+  <div class="ch-head reveal">
+    <div class="ch-num">02</div>
+    <div><span class="kicker">Walk the stream</span><h2 class="ch-title">Draw the current-state map</h2>
+    <p class="lead">A value stream map turns that journey into boxes (steps) and triangles (piles of material waiting). Walk the site step by step to build it.</p></div>
+  </div>
+  <div class="card reveal light-map">
+    <div class="map" id="walkMap"></div>
+    <div class="walk">
+      <div class="walk-text">
+        <div class="walk-step" id="walkStep">Step 0 of 6</div>
+        <div class="disp" id="walkTitle">Start at the supplier</div>
+        <p id="walkBody" style="font-size:14.5px">Press "Next step" to walk to the first process on site.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:space-between;gap:14px">
+        <div class="row"><button class="btn btn-black" id="walkPrev">← Back</button><button class="btn btn-lime" id="walkNext">Next step →</button><button class="btn btn-ghost" id="walkAll">Show whole map</button></div>
+        <div class="kpis" id="walkKpis" style="grid-template-columns:repeat(3,1fr);margin-top:0"></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- CHAPTER 3 -->
+<section class="chapter" id="c3"><div class="wrap">
+  <div class="ch-head reveal">
+    <div class="ch-num">03</div>
+    <div><span class="kicker">Spot the waste</span><h2 class="ch-title">Toyota's seven wastes, on our map</h2>
+    <p class="lead">Taiichi Ohno named seven kinds of waste. Pick one and the map lights up where it hides.</p></div>
+  </div>
+  <div class="card reveal light-map">
+    <div class="pills" id="wastePills"></div>
+    <div class="map" id="wasteMap" style="margin-top:16px"></div>
+    <div class="waste-info">
+      <div style="background:var(--mint);border-radius:var(--r-lg);padding:22px"><div class="disp" style="font-size:22px;margin-bottom:6px" id="wTitle"></div><p style="font-size:14.5px" id="wBody"></p></div>
+      <div><div class="kicker" style="margin-bottom:6px">Non-value-adding hours per batch (Pareto)</div><div id="pareto"></div><p class="note" style="margin-top:8px">Inventory and waiting together explain 72.5% of the 207 wasted hours.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- CHAPTER 4 -->
+<section class="chapter" id="c4"><div class="wrap">
+  <div class="ch-head reveal">
+    <div class="ch-num">04</div>
+    <div><span class="kicker">Pull the levers</span><h2 class="ch-title">Fix the flow yourself</h2>
+    <p class="lead">Switch on each Toyota countermeasure. Steps it changes glow green and carry its number, removed steps fade to dashed outlines, and old values appear crossed out. The change log keeps track of every tweak.</p></div>
+  </div>
+  <div class="reveal">
+    <div class="levers" id="levers"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-lime" id="guided">▶ Guided tour: apply in order</button>
+      <button class="btn btn-black" id="allOn">Switch all on</button>
+      <button class="btn btn-ghost" id="allOff">Reset to current state</button>
+    </div>
+    <div class="narr" id="narr"></div>
+  </div>
+  <div class="card dark reveal" style="margin-top:18px">
+    <div class="row" style="justify-content:space-between"><h3 style="font-size:22px" id="labTitle">Current state</h3><span class="note" id="labSub" style="color:#999">No levers applied</span></div>
+    <div class="map" id="labMap" style="margin-top:12px"></div>
+    <div class="track-wrap" style="margin-top:6px"><div class="track-label"><span>Lead time per floor batch, to scale</span><b id="labLt">26.3 days</b></div><div class="track" id="labTrack"></div></div>
+    <div class="kpis" id="labKpis"></div>
+  </div>
+  <div class="lab-grid reveal">
+    <div class="card"><div class="kicker" style="margin-bottom:12px">What changed (vs. current state)</div><ul class="log" id="log"></ul></div>
+    <div class="card"><div class="kicker" style="margin-bottom:12px">Where the lead time went</div><div id="labBreak"></div><p class="note" style="margin-top:10px">Bars show working days per stage. Ghost bars show the original length.</p></div>
+  </div>
+</div></section>
+
+<!-- CHAPTER 5 -->
+<section class="chapter" id="c5"><div class="wrap">
+  <div class="ch-head reveal">
+    <div class="ch-num">05</div>
+    <div><span class="kicker">The race</span><h2 class="ch-title">Old flow against your flow</h2>
+    <p class="lead">Both tonnes of steel leave the supplier on the same day. The bottom track uses whichever levers you switched on in chapter 4.</p></div>
+  </div>
+  <div class="card dark reveal">
+    <div class="row" style="justify-content:space-between;margin-bottom:20px">
+      <div><div class="kicker" style="color:#888">Working day</div><div class="day" id="rDay">0.0</div></div>
+      <div class="row"><button class="btn btn-lime" id="rPlay">▶ Start the race</button><button class="btn btn-ghost" id="rUseAll" style="color:#bbb">Race with all levers on</button></div>
+    </div>
+    <div class="race">
+      <div class="track-wrap"><div class="track-label"><span>Current state</span><b id="rA">26.3 days</b></div><div class="track" id="rTrackA"></div></div>
+      <div class="track-wrap"><div class="track-label"><span id="rBName">Your flow</span><b id="rB">26.3 days</b></div><div class="track" id="rTrackB"></div></div>
+    </div>
+    <div class="caption" id="rCap">Press start.</div>
+  </div>
+  <div class="rings reveal">
+    <div class="card ringcard"><div class="ring" id="ringA"><div><span>PCE</span><b>21.3%</b></div></div><div><h3 style="font-size:20px">Current state</h3><p class="note" style="font-size:14px;margin-top:6px">93.7 t of steel on site on an average day. 6.8% of every bar becomes scrap.</p></div></div>
+    <div class="card ringcard"><div class="ring" id="ringB"><div><span>PCE</span><b id="ringBv">21.3%</b></div></div><div><h3 style="font-size:20px" id="ringBName">Your flow</h3><p class="note" style="font-size:14px;margin-top:6px" id="ringBTxt"></p></div></div>
+  </div>
+</div></section>
+
+<!-- CHAPTER 6 -->
+<section class="chapter" id="c6"><div class="wrap">
+  <div class="ch-head reveal">
+    <div class="ch-num">06</div>
+    <div><span class="kicker">Your numbers</span><h2 class="ch-title">Run the maths on any material</h2>
+    <p class="lead">Enter your own stream. Each slider you move is highlighted so you can see which input drives the result. Waiting days nearly always dominate.</p></div>
+  </div>
+  <div class="calc reveal">
+    <div class="card">
+      <div class="row" style="margin-bottom:18px"><button class="btn btn-black" id="loadCur">Load current state</button><button class="btn btn-ghost" id="loadLab">Load my lab flow</button></div>
+      <div class="field" data-k="va"><label>Value-adding hours <output id="oVa"></output></label><input id="va" type="range" min="5" max="100" value="56"></div>
+      <div class="field" data-k="nva"><label>Non-value-adding processing hours <output id="oNva"></output></label><input id="nva" type="range" min="0" max="60" value="17"></div>
+      <div class="field" data-k="w"><label>Waiting and inventory days <output id="oW"></output></label><input id="w" type="range" min="0" max="30" step="0.25" value="19"></div>
+      <div class="field" data-k="t"><label>Throughput (tonnes per day) <output id="oT"></output></label><input id="t" type="range" min="1" max="10" step="0.1" value="4.2"></div>
+      <div class="formula">LT = waiting days + (VA + NVA hours) / 10<br>PCE = VA hours / (LT × 10)<br>Pipeline stock ≈ throughput × LT</div>
+    </div>
+    <div class="card">
+      <div class="res"><div><span style="color:#aaa;font-size:13px">Process cycle efficiency</span><br><b id="rPce"></b></div><div style="text-align:right"><span style="color:#aaa;font-size:13px">Lead time</span><br><b id="rLt" style="color:#fff"></b></div></div>
+      <div class="bar3" id="bar3"><i style="background:var(--green)"></i><i style="background:var(--grey)"></i><i style="background:var(--black)"></i></div>
+      <div class="legend" style="color:#555"><span style="--c:var(--green)">Value-adding</span><span style="--c:var(--grey)">NVA processing</span><span style="--c:var(--black)">Waiting</span></div>
+      <div class="res" style="background:var(--mint);color:var(--ink);margin-top:16px"><div><span style="font-size:13px;color:#555">Steel tied up in the pipeline</span><br><b id="rInv" style="color:var(--green)"></b></div></div>
+      <div id="sens" style="font-size:14px;margin-top:6px"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="chapter" id="refs" style="padding-top:40px"><div class="wrap">
+  <div class="reveal"><span class="kicker">Read more</span><h2 class="ch-title">Open-access sources</h2><p class="lead" style="margin-bottom:22px">Every source behind the article and this site is free to read online.</p></div>
+  <ol class="refs reveal" id="refList"></ol>
+</div></section>
+
+<footer><div class="card dark foot">
+  <div><div class="name">Steven Glenn Shiendy</div><div style="color:#bbb">Creativepreneurship Program, BINUS University Bandung, West Java, Indonesia</div>
+    <span class="chip">MGMT6564032 Global Supply Chain Management</span><span class="chip">LA76 · Group 5</span><span class="chip">Forum 13 Task 1</span></div>
+  <div style="font-size:13px;color:#999;max-width:330px">Teaching explainer. Case figures are simulated and calibrated from published studies. They are not measurements from a real project.</div>
+</div></footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const H=10, THR=4.2, PRICE=14500, KG=42000, FLOORS=12, HOLD=0.02, SCALE=27;
+
+/* ---------- Model ---------- */
+const LEVERS=[
+ {id:'A',n:1,name:'e-Kanban pull',tps:'Pull / Kanban',desc:'Orders fire from the takt plan when a floor hits its trigger, not from a weekly guess.',
+  story:'Lever 1, e-Kanban pull. The paper purchase request disappears. A digital card fires when the floor below reaches its trigger, so the order queue drops from 3 days to half a day.'},
+ {id:'B',n:2,name:'Off-site cut and bend',tps:'Flow / Jidoka',desc:'The supplier cuts and bends from the BIM bar-bending schedule in a controlled shop.',
+  story:'Lever 2, off-site cut and bend. Bending moves to the supplier\'s shop. The on-site bending shed and its 4-day pile of bent bars disappear, and scrap falls from 6.8% to 2.9%.'},
+ {id:'C',n:3,name:'JIT floor kits',tps:'Just-in-Time',desc:'Labelled kits for one floor, QR check at the gate, straight to the crane zone.',
+  story:'Lever 3, just-in-time kits. Steel arrives as labelled kits for one floor. A QR scan replaces manual tagging, the yard shuffle disappears, and fixers stop searching for bar marks.'},
+ {id:'D',n:4,name:'Takt rhythm',tps:'Heijunka / Takt',desc:'A steady 10-day floor beat with one takt of buffer sets how much steel is on site.',
+  story:'Lever 4, takt rhythm. Every floor follows a 10-day beat, so the yard only needs one takt of buffer. The laydown pile shrinks, especially when kits are on too.'}
+];
+const L={A:false,B:false,C:false,D:false};
+
+function build(s){
+  const st=[];
+  st.push(s.A?{key:'order',name:'e-Kanban pull order',loc:'site office',ct:1,wait:.5,by:['A']}
+             :{key:'order',name:'Purchase request & approval',loc:'site office',ct:4,wait:3,by:[]});
+  if(s.B) st.push({key:'offsite',name:'Off-site cut & bend',loc:'supplier shop',ct:14,va:1,wait:1,by:['B'],isNew:1});
+  const dw = s.C&&s.D?1.5 : s.D?4 : s.C?5 : 9.5;
+  const dby=[s.C&&'C',s.D&&'D'].filter(Boolean);
+  st.push(s.C?{key:'deliv',name:'JIT kit delivery & QR check',loc:'site gate',ct:4,wait:dw,by:dby,delivery:1}
+             :{key:'deliv',name:'Bulk delivery & unloading',loc:'site gate',ct:6,wait:dw,by:dby,delivery:1});
+  if(s.C) st.push({key:'insp',name:'Inspection & tagging',ghost:1,by:['C'],ct:0,wait:0});
+  else st.push({key:'insp',name:'Inspection & tagging',loc:'laydown yard',ct:2,wait:1.5,by:[]});
+  if(s.B) st.push({key:'cut',name:'Cut & bend on site',ghost:1,by:['B'],ct:0,wait:0});
+  else st.push({key:'cut',name:'Cut & bend on site',loc:'bending shed',ct:16,va:1,wait:4,by:[]});
+  st.push(s.C?{key:'lift',name:'Direct crane lift',loc:'crane zone',ct:3,wait:.25,by:['C']}
+             :{key:'lift',name:'Transport & crane lift',loc:'yard to crane',ct:5,wait:1,by:[]});
+  st.push({key:'fix',name:'Fixing & installation',loc:'slab',ct:s.C?36:40,va:1,wait:0,by:s.C?['C']:[]});
+  return st;
+}
+const BASE=build({A:0,B:0,C:0,D:0});
+const baseOf=k=>BASE.find(x=>x.key===k);
+
+function metrics(s){
+  const st=build(s).filter(x=>!x.ghost);
+  const ct=st.reduce((a,x)=>a+x.ct,0), va=st.filter(x=>x.va).reduce((a,x)=>a+x.ct,0), wt=st.reduce((a,x)=>a+x.wait,0);
+  const lt=wt+ct/H, pce=va/(lt*H)*100;
+  const di=st.findIndex(x=>x.delivery);
+  const dwell=st.slice(di).reduce((a,x)=>a+x.wait,0)+st.slice(di+1).reduce((a,x)=>a+x.ct,0)/H;
+  const inv=THR*dwell, waste=s.B?2.9:6.8;
+  const hand=5-(s.C?2:0)-(s.B?1:0), dist=420-(s.C?190:0)-(s.B?80:0);
+  return {ct,va,wt,lt,pce,inv,waste,hand,dist,hold:inv*1000*PRICE*HOLD/1e6,scrap:KG*FLOORS*waste/100*PRICE/1e6};
+}
+const BM=metrics({A:0,B:0,C:0,D:0});
+const f1=x=>(Math.round(x*10)/10).toLocaleString('en-US',{maximumFractionDigits:1});
+const f2=x=>(Math.round(x*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
+
+/* ---------- Map renderer ---------- */
+function renderMap(el,steps,o={}){
+  el.innerHTML='';
+  steps.forEach((x,i)=>{
+    const b=x.ghost?null:baseOf(x.key);
+    const tw=!x.ghost&&x.by&&x.by.length;
+    const n=document.createElement('div');
+    n.className='node'+(x.va&&!x.ghost?' va':'')+(x.ghost?' ghost':'')+(tw&&o.showTweaks?' tw':'');
+    n.dataset.key=x.key; n.dataset.i=i;
+    let ctTxt='';
+    if(x.ghost) ctTxt='Removed';
+    else{
+      ctTxt=`CT ${x.ct} h`;
+      if(o.showTweaks&&b&&b.ct!==x.ct) ctTxt+=`<s>${b.ct} h</s>`;
+      if(o.showTweaks&&x.isNew) ctTxt+=' · new';
+      ctTxt+=` · ${x.va?'value-adding':'non-value-adding'}`;
+    }
+    n.innerHTML=`${o.showTweaks&&x.by&&x.by.length?`<div class="badges">${x.by.map(id=>`<span class="badge">${LEVERS.find(l=>l.id===id).n}</span>`).join('')}</div>`:''}
+      ${x.loc&&!x.ghost?`<div class="loc">${x.loc}</div>`:''}<h4>${x.name}</h4><div class="ct">${ctTxt}</div>`;
+    el.appendChild(n);
+    if(i<steps.length-1){
+      if(x.ghost||x.key==='fix'){const a=document.createElement('div');a.className='arrow';a.dataset.i=i;el.appendChild(a);return;}
+      const w=document.createElement('div');
+      const bw=b?b.wait:null, changed=o.showTweaks&&b&&bw!==x.wait || (o.showTweaks&&x.isNew);
+      w.className='wait'+(x.wait<=2?' small':'')+(changed?' tw':'');
+      w.dataset.key=x.key; w.dataset.i=i;
+      const s=Math.max(7,Math.min(26,6+x.wait*2.1));
+      w.innerHTML=`<div class="tri" style="--s:${s}px"></div><span>${f2(x.wait)} d${changed&&b&&!x.isNew?`<s>${f2(bw)}</s>`:''}</span>`;
+      el.appendChild(w);
+    }
+  });
+}
+
+/* ---------- Track ---------- */
+function segsOf(steps){
+  const out=[];
+  steps.filter(x=>!x.ghost).forEach(x=>{
+    out.push({d:x.ct/H,cls:x.va?'va':'p',label:x.name,kind:'work',x});
+    if(x.wait>0) out.push({d:x.wait,cls:'w',label:x.name,kind:'wait',x});
+  });
+  return out;
+}
+function renderTrack(el,steps,o={}){
+  el.innerHTML='';
+  const segs=segsOf(steps);
+  segs.forEach(s=>{
+    const d=document.createElement('div');
+    const b=baseOf(s.x.key); const tw=o.showTweaks&&s.x.by&&s.x.by.length;
+    d.className='seg '+s.cls+(tw?' tw':'');
+    d.style.width=(s.d/SCALE*100)+'%'; d.title=`${s.label}: ${f2(s.d)} d ${s.kind==='wait'?'waiting':'working'}`;
+    el.appendChild(d);
+  });
+  if(o.marker){const m=document.createElement('div');m.className='marker';m.textContent='1t';el.appendChild(m);}
+  return segs;
+}
+
+/* ---------- Chapter 1: journey ---------- */
+const CAPS={
+ order:['Day {d}. A site engineer writes a paper purchase request.','Day {d}. The request sits in an approval queue.'],
+ deliv:['Day {d}. A full truck unloads two floors of steel at the gate.','Day {d}. The steel waits in the laydown yard. And waits.'],
+ insp:['Day {d}. QC tags every bundle by hand.','Day {d}. Tagged bundles queue for the bending shed.'],
+ cut:['Day {d}. Bar benders cut and bend. <b>Real value is added.</b>','Day {d}. Bent bars pile up, made ahead of need.'],
+ lift:['Day {d}. Bundles are dragged to the crane and lifted.','Day {d}. Waiting for a crane slot.'],
+ fix:['Day {d}. Fixers tie the bars into the slab. <b>Real value is added.</b>',''],
+ offsite:['Day {d}. The supplier bends the bars in its shop. <b>Real value is added.</b>','Day {d}. Kits ship to site.']
+};
+function player(trackEl,dayEl,capEl,steps,onEnd){
+  const segs=renderTrack(trackEl,steps,{marker:true});
+  const m=trackEl.querySelector('.marker'); const total=segs.reduce((a,s)=>a+s.d,0);
+  let raf=null,t0=null,day=0; const speed=3.4; // days per second
+  function frame(ts){
+    if(!t0)t0=ts-day/speed*1000;
+    day=Math.min(total,(ts-t0)/1000*speed);
+    m.style.left=(day/SCALE*100)+'%'; dayEl.textContent=f1(day);
+    let acc=0; for(const s of segs){ if(day<=acc+s.d+1e-9){ const c=CAPS[s.x.key][s.kind==='work'?0:1]; if(c&&capEl)capEl.innerHTML=c.replace('{d}',f1(day)); break;} acc+=s.d; }
+    if(day<total) raf=requestAnimationFrame(frame); else {raf=null; onEnd&&onEnd(total);}
+  }
+  return {play(){ if(raf)return; if(day>=total)day=0; t0=null; raf=requestAnimationFrame(frame);},
+          reset(){cancelAnimationFrame(raf);raf=null;day=0;m.style.left='0%';dayEl.textContent='0.0';}};
+}
+const j1=player($('j1Track'),$('j1Day'),$('j1Cap'),BASE,t=>{$('j1Cap').innerHTML=`Arrived after <b>${f1(t)} working days</b>. Only 56 of its 263 working hours (21.3%) added value to the building. The rest was paperwork, handling and waiting.`;});
+$('j1Play').onclick=()=>j1.play(); $('j1Reset').onclick=()=>{j1.reset();$('j1Cap').textContent='The steel has not been ordered yet.'};
+
+/* ---------- Chapter 2: walk ---------- */
+const WALK=[
+ ['Purchase request & approval','A site engineer fills a paper purchase order from a weekly push schedule. It waits 3 days for signatures. Nothing has happened to the steel yet.'],
+ ['Bulk delivery & unloading','A full truck drops about 40 t, two floors of steel, because full loads are cheaper. It sits in the laydown yard for 9.5 days. This is the biggest triangle on the map.'],
+ ['Inspection & tagging','QC checks mill certificates and ties paper tags on bundles. Another 1.5 days in the queue.'],
+ ['Cut & bend on site','Bar benders work ahead of need to stay busy. This is value-adding (16 h), but the bent bars then wait 4 days as work in process.'],
+ ['Transport & crane lift','Bundles are dragged from the shed to the crane, then wait about 1 day for a free crane slot.'],
+ ['Fixing & installation','Fixers spend 40 hours tying bars into the slab. The client is paying for this step and bending, nothing else.']
+];
+let walkI=0;
+renderMap($('walkMap'),BASE,{});
+function walk(){
+  const nodes=[...$('walkMap').children];
+  nodes.forEach(el=>{const i=+el.dataset.i; const show = el.classList.contains('node')? i<walkI : i<walkI-1; el.classList.toggle('hidden',!show);});
+  const step=WALK[walkI-1];
+  $('walkStep').textContent=`Step ${walkI} of 6`;
+  $('walkTitle').textContent=walkI?step[0]:'Start at the supplier';
+  $('walkBody').textContent=walkI?step[1]:'Press "Next step" to walk to the first process on site.';
+  $('walkPrev').disabled=walkI===0; $('walkNext').disabled=walkI===6;
+  const vis=BASE.slice(0,walkI); const ct=vis.reduce((a,x)=>a+x.ct,0), va=vis.filter(x=>x.va).reduce((a,x)=>a+x.ct,0), wt=vis.slice(0,Math.max(0,walkI-1)).reduce((a,x)=>a+x.wait,0)+(walkI===6?0:0);
+  const lt=wt+ct/H;
+  $('walkKpis').innerHTML=kpi('Lead time so far',f1(lt)+' d')+kpi('Value-adding',va+' h')+kpi('PCE so far',lt?f1(va/(lt*H)*100)+'%':'0%');
+  if(walkI){const n=$('walkMap').querySelector(`.node[data-i="${walkI-1}"]`); $('walkMap').scrollLeft=Math.max(0,n.offsetLeft-120);}
+}
+function kpi(k,v,d,good){return `<div class="kpi"><span class="k">${k}</span><b>${v}</b>${d!==undefined?`<span class="d ${good?'good':''}">${d}</span>`:''}</div>`}
+$('walkNext').onclick=()=>{walkI=Math.min(6,walkI+1);walk()};
+$('walkPrev').onclick=()=>{walkI=Math.max(0,walkI-1);walk()};
+$('walkAll').onclick=()=>{walkI=6;walk()};
+walk();
+
+/* ---------- Chapter 3: wastes ---------- */
+const WASTES={
+ 'Inventory':{nodes:[],waits:['deliv','cut'],h:95,t:'Steel parked in the laydown yard (9.5 d) and bent bars waiting (4 d). The largest waste: 95 of 207 wasted hours, 45.9%.'},
+ 'Waiting':{nodes:[],waits:['order','insp','lift'],h:55,t:'Queues for approval, inspection and crane slots. 55 hours per batch where steel waits for a person or a machine.'},
+ 'Overproduction':{nodes:['cut'],waits:['cut'],h:40,t:'Bending bars days before the floor needs them, just to keep the bending crew busy. It creates 40 hours of work in process.'},
+ 'Transport':{nodes:['deliv','lift'],waits:[],h:11,t:'Gate to yard, yard to shed, shed to crane. Five handlings and about 420 m of travel per batch.'},
+ 'Over-processing':{nodes:['order','insp'],waits:[],h:6,t:'Paper purchase orders and hand-written tags that are typed again later. A QR scan could record them once.'},
+ 'Motion':{nodes:['fix'],waits:[],h:null,t:'Fixers walking and searching through mixed bundles for the right bar mark. Not timed in the Pareto, but labelled kits remove most of it.'},
+ 'Defects':{nodes:['cut'],waits:[],h:null,t:'Wrong cuts and offcuts that end up as scrap: 6.8% of all steel, about IDR 497 million over 12 floors.'}
+};
+renderMap($('wasteMap'),BASE,{});
+function pickWaste(k){
+  [...$('wastePills').children].forEach(p=>p.classList.toggle('on',p.textContent===k));
+  const w=WASTES[k];
+  $('wasteMap').querySelectorAll('.node,.wait').forEach(el=>{
+    const isNode=el.classList.contains('node'); const hit=isNode?w.nodes.includes(el.dataset.key):w.waits.includes(el.dataset.key);
+    el.classList.toggle('hl',hit); el.classList.toggle('dim',!hit);
+  });
+  $('wTitle').textContent=k; $('wBody').textContent=w.t;
+  [...$('pareto').children].forEach(r=>r.classList.toggle('on',r.dataset.k===k));
+}
+Object.keys(WASTES).forEach(k=>{const b=document.createElement('button');b.className='pill';b.textContent=k;b.onclick=()=>pickWaste(k);$('wastePills').appendChild(b);});
+$('pareto').innerHTML=Object.entries(WASTES).filter(([k,v])=>v.h).map(([k,v])=>`<div class="hbar" data-k="${k}"><span class="lab">${k}</span><span class="b" style="width:${v.h/95*60}%"></span><span>${v.h} h</span></div>`).join('');
+pickWaste('Inventory');
+
+/* ---------- Chapter 4: lab ---------- */
+LEVERS.forEach(l=>{
+  const b=document.createElement('button'); b.className='lever'; b.id='lv'+l.id;
+  b.innerHTML=`<div class="top"><span class="n">${l.n}</span><span class="switch"></span></div><h3>${l.name}</h3><p>${l.desc}</p><span class="tps">${l.tps}</span>`;
+  b.onclick=()=>toggle(l.id); $('levers').appendChild(b);
+});
+let prevM=BM;
+function toggle(id,quiet){
+  const before=metrics(L); L[id]=!L[id]; const after=metrics(L);
+  if(!quiet){const l=LEVERS.find(x=>x.id===id);
+    toast(`Lever ${l.n} ${L[id]?'on':'off'}: lead time <b>${sign(after.lt-before.lt)} d</b>, PCE <b>${sign(after.pce-before.pce)} pts</b>, stock <b>${sign(after.inv-before.inv)} t</b>`);}
+  updateLab(before);
+}
+const sign=x=>(x>0?'+':x<0?'−':'±')+f1(Math.abs(x));
+function updateLab(before){
+  LEVERS.forEach(l=>$('lv'+l.id).classList.toggle('on',L[l.id]));
+  const st=build(L), m=metrics(L);
+  renderMap($('labMap'),st,{showTweaks:true});
+  renderTrack($('labTrack'),st,{showTweaks:true});
+  $('labLt').textContent=f2(m.lt)+' days';
+  const on=LEVERS.filter(l=>L[l.id]);
+  $('labTitle').textContent=on.length===4?'Future state':on.length?'Your flow':'Current state';
+  $('labSub').textContent=on.length?`Levers on: ${on.map(l=>l.n).join(', ')}`:'No levers applied';
+  const K=[['Lead time',f2(m.lt)+' d',m.lt,BM.lt,' d',true],['PCE',f1(m.pce)+'%',m.pce,BM.pce,' pts',false],['Steel on site',f1(m.inv)+' t',m.inv,BM.inv,' t',true],
+           ['Handlings',m.hand,m.hand,BM.hand,'',true],['Travel',m.dist+' m',m.dist,BM.dist,' m',true],['Scrap rate',m.waste+'%',m.waste,BM.waste,' pts',true]];
+  const changedIdx=before?K.map((k,i)=>{const bm=[before.lt,before.pce,before.inv,before.hand,before.dist,before.waste][i];return Math.abs(bm-k[2])>1e-9}):[];
+  $('labKpis').innerHTML=K.map(([k,v,cur,base,u,lower],i)=>{const d=cur-base; const good=lower?d<0:d>0;
+    return `<div class="kpi ${changedIdx[i]?'flash':''}"><span class="k">${k}</span><b>${v}</b><span class="d ${d&&good?'good':''}">${Math.abs(d)<1e-9?'baseline':sign(d)+u+' vs current'}</span></div>`}).join('');
+  // change log
+  const items=[];
+  st.forEach(x=>{
+    const b=baseOf(x.key), tag=(x.by||[]).map(id=>`<span class="badge">${LEVERS.find(l=>l.id===id).n}</span>`).join('');
+    if(x.ghost) items.push([tag,`<b>${x.name}</b> removed from the site flow.`]);
+    else if(x.isNew) items.push([tag,`<b>${x.name}</b> added at the supplier: ${x.ct} h value-adding, ${x.wait} d to ship.`]);
+    else if(b){const parts=[];
+      if(b.name!==x.name) parts.push(`renamed from "${b.name}"`);
+      if(b.ct!==x.ct) parts.push(`cycle time ${b.ct} h → ${x.ct} h`);
+      if(b.wait!==x.wait) parts.push(`waiting ${f2(b.wait)} d → ${f2(x.wait)} d`);
+      if(parts.length) items.push([tag,`<b>${x.name}</b>: ${parts.join(', ')}.`]);}
+  });
+  if(L.B) items.push(['<span class="badge">2</span>',`<b>Scrap</b> 6.8% → 2.9%, saving about IDR ${f1((BM.scrap-m.scrap))} million over 12 floors.`]);
+  $('log').innerHTML=items.length?items.map(([t,s])=>`<li>${t}<span>${s}</span></li>`).join(''):'<li class="empty">Nothing tweaked yet. Switch on a lever above.</li>';
+  // breakdown by stage
+  const stages=[['Ordering',['order']],['Supplier',['offsite']],['Delivery & yard',['deliv']],['Inspection',['insp']],['Bending on site',['cut']],['Lift',['lift']],['Fixing',['fix']]];
+  const dOf=(arr,k)=>{const x=arr.find(s=>s.key===k&&!s.ghost);return x?x.ct/H+x.wait:0};
+  $('labBreak').innerHTML=stages.map(([n,ks])=>{const now=ks.reduce((a,k)=>a+dOf(st,k),0), was=ks.reduce((a,k)=>a+dOf(BASE,k),0);
+    if(!now&&!was)return''; const mx=11;
+    return `<div class="hbar ${Math.abs(now-was)>1e-9?'on':''}"><span class="lab">${n}</span><span style="flex:1;position:relative;height:14px"><span class="b" style="position:absolute;left:0;top:0;width:${was/mx*100}%;background:#eee"></span><span class="b" style="position:absolute;left:0;top:0;width:${now/mx*100}%;background:${Math.abs(now-was)>1e-9?'var(--green)':'#bbb'}"></span></span><span style="width:70px;text-align:right">${f2(now)} d</span></div>`}).join('');
+  updateRace();
+}
+let tIm;function toast(h){$('toast').innerHTML=h;$('toast').classList.add('show');clearTimeout(tIm);tIm=setTimeout(()=>$('toast').classList.remove('show'),3200);}
+$('allOn').onclick=()=>{const b=metrics(L);LEVERS.forEach(l=>L[l.id]=true);updateLab(b);toast('All four levers on: this is the <b>future-state map</b>.')};
+$('allOff').onclick=()=>{const b=metrics(L);LEVERS.forEach(l=>L[l.id]=false);updateLab(b);$('narr').classList.remove('show')};
+let guiding=false;
+$('guided').onclick=async()=>{
+  if(guiding)return; guiding=true; $('guided').disabled=true;
+  const b=metrics(L);LEVERS.forEach(l=>L[l.id]=false);updateLab(b);
+  $('labMap').scrollIntoView({behavior:'smooth',block:'center'});
+  for(const l of LEVERS){
+    await new Promise(r=>setTimeout(r,1300));
+    $('narr').innerHTML=`<b>${l.n}/4</b> ${l.story}`;$('narr').classList.add('show');
+    toggle(l.id);
+    await new Promise(r=>setTimeout(r,2600));
+  }
+  $('narr').innerHTML=`<b>Done.</b> Lead time fell from 26.3 to 9.05 days and PCE rose from 21.3% to 55.2%. Scroll to chapter 5 to race the two flows.`;
+  guiding=false;$('guided').disabled=false;
+};
+
+/* ---------- Chapter 5: race ---------- */
+let raceSteps=null;
+function updateRace(){
+  const m=metrics(L), on=LEVERS.filter(l=>L[l.id]);
+  const name=on.length===4?'Future state (all levers)':on.length?`Your flow (levers ${on.map(l=>l.n).join(', ')})`:'Your flow (no levers yet)';
+  $('rBName').textContent=name;$('ringBName').textContent=name;
+  $('rB').textContent=f2(m.lt)+' days';
+  $('ringB').style.background=`conic-gradient(var(--green) 0 ${m.pce}%, #e7e7e2 ${m.pce}% 100%)`;$('ringBv').textContent=f1(m.pce)+'%';
+  $('ringBTxt').textContent=`${f1(m.inv)} t of steel on site on an average day. ${m.waste}% of every bar becomes scrap.`;
+  renderTrack($('rTrackA'),BASE,{marker:true}); renderTrack($('rTrackB'),build(L),{marker:true,showTweaks:true});
+}
+$('ringA').style.background=`conic-gradient(#555 0 ${BM.pce}%, #e7e7e2 ${BM.pce}% 100%)`;
+let rRaf=null;
+$('rPlay').onclick=()=>{
+  if(rRaf)return; updateRace();
+  const tA=BM.lt, mB=metrics(L), tB=mB.lt, mA=$('rTrackA').querySelector('.marker'), mBk=$('rTrackB').querySelector('.marker');
+  let t0=null; const sp=3.4; let doneB=false;
+  $('rCap').textContent='They are off.';
+  const fr=ts=>{ if(!t0)t0=ts; const d=(ts-t0)/1000*sp;
+    mA.style.left=Math.min(d,tA)/SCALE*100+'%'; mBk.style.left=Math.min(d,tB)/SCALE*100+'%'; $('rDay').textContent=f1(Math.min(d,Math.max(tA,tB)));
+    if(!doneB&&d>=tB&&tB<tA){doneB=true;$('rCap').innerHTML=`Your flow arrives on day <b>${f2(tB)}</b>. The old flow still has ${f1(tA-tB)} days to go.`;}
+    if(d<Math.max(tA,tB)) rRaf=requestAnimationFrame(fr);
+    else{rRaf=null; $('rCap').innerHTML= tB<tA?`Old flow arrives on day ${f2(tA)}. Yours was <b>${f1((tA-tB)/tA*100)}% faster</b> with ${f1(BM.inv-mB.inv)} t less steel lying around.`:'Same result. Go back to chapter 4 and switch on a lever.';}
+  };
+  rRaf=requestAnimationFrame(fr);
+};
+$('rUseAll').onclick=()=>{const b=metrics(L);LEVERS.forEach(l=>L[l.id]=true);updateLab(b);setTimeout(()=>$('rPlay').click(),300)};
+
+/* ---------- Chapter 6: calculator ---------- */
+let lastK=null;
+function calc(k){
+  const va=+$('va').value,n=+$('nva').value,w=+$('w').value,t=+$('t').value;
+  $('oVa').textContent=va;$('oNva').textContent=n;$('oW').textContent=w;$('oT').textContent=t;
+  const lt=w+(va+n)/H,pce=va/(lt*H)*100;
+  $('rPce').textContent=f1(pce)+'%';$('rLt').textContent=f2(lt)+' d';$('rInv').textContent=Math.round(t*lt)+' t';
+  const tot=lt*H,b=$('bar3').children;b[0].style.width=va/tot*100+'%';b[1].style.width=n/tot*100+'%';b[2].style.width=w*H/tot*100+'%';
+  document.querySelectorAll('.field').forEach(f=>f.style.background=f.dataset.k===k?'var(--mint)':'');
+  document.querySelectorAll('.field').forEach(f=>{f.style.borderRadius='14px';f.style.padding=f.dataset.k===k?'10px 12px':'0';f.style.transition='.3s'});
+  // sensitivity: effect of 1 less waiting day vs 10 fewer NVA hours (same 1 day)
+  const lt2=(w-1)+(va+n)/H; const p2=va/(Math.max(lt2,.01)*H)*100;
+  $('sens').innerHTML=w>=1?`Cutting <b>one waiting day</b> lifts PCE to ${f1(p2)}% (+${f1(p2-pce)} pts) and frees ${f1(t)} t of stock.`:'Waiting is already near zero. Work on value-adding time next.';
+}
+['va','nva','w','t'].forEach(i=>$(i).addEventListener('input',()=>calc(i)));
+const setCalc=(va,n,w)=>{$('va').value=va;$('nva').value=n;$('w').value=w;$('t').value=4.2;calc(null)};
+$('loadCur').onclick=()=>setCalc(56,17,19);
+$('loadLab').onclick=()=>{const m=metrics(L);setCalc(m.va,m.ct-m.va,m.wt)};
+calc(null);
+
+/* ---------- refs ---------- */
+const refs=[
+["Albert et al. (2026). Challenges hindering Just-in-Time on construction projects in Nigeria. Journal of Construction Project Management and Innovations.","https://doi.org/10.36615/jcpmi.v16i1.4561"],
+["Chen, Qiu & Chen (2024). Integrating lean construction with sustainable construction. Sustainability.","https://doi.org/10.3390/su16219387"],
+["El Hafiane, En-nadi & Ramadany (2025). Systematic review of lean and circular economy integration. Sustainability.","https://doi.org/10.3390/su17156735"],
+["Eldeep, Farag & Abd El-hafez (2022). Using BIM as a lean management tool in construction processes. Ain Shams Engineering Journal.","https://doaj.org/article/7c02a08e73064e6c96314185712c49a0"],
+["Fitriani, Ajayi & Kim (2023). Underlying causes of waste generation in Indonesia's construction industry. Sustainability.","https://doi.org/10.3390/su15010409"],
+["Gazali et al. (2025). Impact of lean construction implementation on construction building projects. Jurnal Pensil.","https://doi.org/10.21009/jpensil.v14i2.54389"],
+["Gehring & Rüppel (2023). Data fusion approach for a digital construction logistics twin. Frontiers in Built Environment.","https://doi.org/10.3389/fbuil.2023.1145250"],
+["Junussova et al. (2024). Key drivers for BIM-enabled materials management. Buildings.","https://doi.org/10.3390/buildings14010084"],
+["Sotorrío Ortega, Cobo Escamilla & Tenorio Ríos (2023). Industrialized construction and sustainability: A literature review. Buildings.","https://doi.org/10.3390/buildings13112861"],
+["Agrawal et al. (2024). Automation of planning and control in Last Planner System: A systematic review. Developments in the Built Environment.","https://doaj.org/article/62ba092b6b304eefb1d7c116e151b28b"],
+["Anggraini et al. (2022). Implementation of lean construction to eliminate waste: A case study in Indonesia. Jurnal Teknik Industri.","https://doi.org/10.22219/jtiumm.vol23.no1.1-16"],
+["Batwara et al. (2023). Towards smart sustainable development through value stream mapping. Heliyon.","https://doi.org/10.1016/j.heliyon.2023.e15852"],
+["Berawi et al. (2023). Lean construction practice on toll road project improvement. Civil Engineering Journal.","https://doi.org/10.28991/CEJ-2023-09-12-016"],
+["Berroir et al. (2021). Reducing construction logistics costs and embodied carbon with CCC and kitting. IGLC29.","https://doi.org/10.24928/2021/0120"],
+["Chavan, Langar & Ghosh (2025). Optimizing volumetric offsite construction production line by VSM. ASC 2025.","https://doi.org/10.29007/48cf"],
+["Chen, Guo & Xue (2023). A VSM approach to lean opportunities for off-site construction production. CONVR 2023.","https://books.fupress.com/doi/capitoli/979-12-215-0289-3_38"],
+["Dixit et al. (2022). Site logistics factors impacting resource use on construction sites. Frontiers in Built Environment.","https://doi.org/10.3389/fbuil.2022.858135"],
+["Espinoza, Herrera & Brioso (2021). Use of VSM in a case study in basement construction. IGLC29.","https://doi.org/10.24928/2021/0189"],
+["Garcés et al. (2025). Systematic review of lean construction. Journal of Infrastructure Preservation and Resilience.","https://doi.org/10.1186/s43065-025-00119-1"],
+["Horsthofer-Rauch et al. (2024). Sustainability-integrated value stream mapping with process mining. Production & Manufacturing Research.","https://doi.org/10.1080/21693277.2024.2334294"],
+["Iparraguirre-Villanueva et al. (2023). Lean construction in the management of material transportation: A review. IJETT.","https://doi.org/10.14445/22315381/IJETT-V71I8P232"],
+["Karaz & Teixeira (2023). Waste elimination based on lean construction and BIM. U.Porto Journal of Engineering.","https://doi.org/10.24840/2183-6493_009-003_001808"],
+["Maraqa, Sacks & Spatari (2022). Role of lean and VDC in reducing physical and operational waste. IGLC30.","https://doi.org/10.24928/2022/0104"],
+["Michaud et al. (2019). A lean approach to optimize BIM information flow using VSM. ITcon.","https://www.itcon.org/2019/25"],
+["Naser, Al-Sulaiti & Dahmani (2023). Using VSM in infrastructure construction projects in Qatar. CIC 2023.","https://doi.org/10.29117/cic.2023.0029"],
+["Nik-Bakht et al. (2021). Value stream mapping of project lifecycle data for circular construction. ISARC 2021.","https://www.iaarc.org/publications/2021_proceedings_of_the_38th_isarc/value_stream_mapping_of_project_lifecycle_data_for_circular_construction.html"],
+["Pasqualini & Zawislak (2005). VSM in construction: A case study in a Brazilian construction company. IGLC13.","https://iglc.net/Papers/Details/356"],
+["Power (2024). Takt complementing Last Planner System on residential construction projects. Construction Economics and Building.","https://doi.org/10.5130/AJCEB.v24i4/5.8846"],
+["Power, Sinnott & Lynch (2023). An examination of IGLC takt literature. IGLC31.","https://doi.org/10.24928/2023/0218"],
+["Prayuda et al. (2021). Critical review on development of lean construction in Indonesia. ICoSITEA 2020.","https://doi.org/10.2991/aer.k.210204.018"],
+["Seppänen & Peltokorpi (2016). A new model for construction material logistics. IGLC24.","https://www.iglc.net/papers/details/1247"],
+["Wibowo & Ammar (2025). Lean construction and sustainability: Research trends and the UN SDGs. E3S Web of Conferences.","https://doi.org/10.1051/e3sconf/202560503048"]];
+refs.sort((a,b)=>a[0].localeCompare(b[0]));$('refList').innerHTML=refs.map(r=>`<li>${r[0]} <a href="${r[1]}" target="_blank" rel="noopener">${r[1]}</a></li>`).join('');
+
+/* ---------- scroll story mechanics ---------- */
+updateLab(null);
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const chapters=[...document.querySelectorAll('.chapter[id^="c"]')], links=[...document.querySelectorAll('#chapNav a')];
+function onScroll(){
+  const h=document.documentElement; $('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  let cur=-1; chapters.forEach((c,i)=>{if(c.getBoundingClientRect().top<window.innerHeight*.45)cur=i});
+  links.forEach((a,i)=>a.classList.toggle('on',i===cur));
+}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+// hero counter
+(()=>{let v=0;const tgt=21.3;const id=setInterval(()=>{v=Math.min(tgt,v+.6);$('heroNum').textContent=f1(v)+'%';if(v>=tgt)clearInterval(id)},30)})();
+// auto-play journey once when chapter 1 is reached
+const auto=new IntersectionObserver(es=>{if(es[0].isIntersecting){setTimeout(()=>j1.play(),500);auto.disconnect()}},{threshold:.6});
+auto.observe($('j1Track'));
+</script>
+</body>
+</html>
